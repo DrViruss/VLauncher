@@ -32,14 +32,9 @@
             this.Debug = new System.Windows.Forms.CheckBox();
             this.hasAccount = new System.Windows.Forms.CheckBox();
             this.username_tb = new System.Windows.Forms.TextBox();
-            this.token_tb = new System.Windows.Forms.TextBox();
-            this.uuid_tb = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.Login_tb = new System.Windows.Forms.TextBox();
             this.Passwd_tb = new System.Windows.Forms.TextBox();
-            this.login_btn = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -47,6 +42,9 @@
             this.ChDir_btn = new System.Windows.Forms.Button();
             this.ram_track = new System.Windows.Forms.TrackBar();
             this.ram_label = new System.Windows.Forms.Label();
+            this.myJava = new System.Windows.Forms.CheckBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.ram_track)).BeginInit();
             this.SuspendLayout();
             // 
@@ -89,24 +87,6 @@
             this.username_tb.Size = new System.Drawing.Size(100, 20);
             this.username_tb.TabIndex = 4;
             // 
-            // token_tb
-            // 
-            this.token_tb.Enabled = false;
-            this.token_tb.Location = new System.Drawing.Point(289, 43);
-            this.token_tb.MaxLength = 308;
-            this.token_tb.Name = "token_tb";
-            this.token_tb.Size = new System.Drawing.Size(100, 20);
-            this.token_tb.TabIndex = 5;
-            // 
-            // uuid_tb
-            // 
-            this.uuid_tb.Enabled = false;
-            this.uuid_tb.Location = new System.Drawing.Point(289, 69);
-            this.uuid_tb.MaxLength = 36;
-            this.uuid_tb.Name = "uuid_tb";
-            this.uuid_tb.Size = new System.Drawing.Size(100, 20);
-            this.uuid_tb.TabIndex = 6;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -116,52 +96,24 @@
             this.label1.TabIndex = 7;
             this.label1.Text = "Username";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(216, 50);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(67, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "accesToken";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(228, 76);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(29, 13);
-            this.label3.TabIndex = 7;
-            this.label3.Text = "Uuid";
-            // 
             // Login_tb
             // 
-            this.Login_tb.Location = new System.Drawing.Point(157, 273);
+            this.Login_tb.Location = new System.Drawing.Point(289, 46);
             this.Login_tb.Name = "Login_tb";
             this.Login_tb.Size = new System.Drawing.Size(100, 20);
             this.Login_tb.TabIndex = 8;
             // 
             // Passwd_tb
             // 
-            this.Passwd_tb.Location = new System.Drawing.Point(157, 299);
+            this.Passwd_tb.Location = new System.Drawing.Point(289, 72);
             this.Passwd_tb.Name = "Passwd_tb";
             this.Passwd_tb.Size = new System.Drawing.Size(100, 20);
             this.Passwd_tb.TabIndex = 8;
             // 
-            // login_btn
-            // 
-            this.login_btn.Location = new System.Drawing.Point(13, 286);
-            this.login_btn.Name = "login_btn";
-            this.login_btn.Size = new System.Drawing.Size(75, 23);
-            this.login_btn.TabIndex = 9;
-            this.login_btn.Text = "Auth";
-            this.login_btn.UseVisualStyleBackColor = true;
-            this.login_btn.Click += new System.EventHandler(this.login_btn_Click);
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(113, 280);
+            this.label4.Location = new System.Drawing.Point(245, 53);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(32, 13);
             this.label4.TabIndex = 7;
@@ -170,7 +122,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(98, 306);
+            this.label5.Location = new System.Drawing.Point(230, 79);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(53, 13);
             this.label5.TabIndex = 7;
@@ -218,28 +170,60 @@
             this.ram_label.Name = "ram_label";
             this.ram_label.Size = new System.Drawing.Size(35, 13);
             this.ram_label.TabIndex = 13;
-            this.ram_label.Text = "label7";
+            this.ram_label.Text = "HELP";
+            // 
+            // myJava
+            // 
+            this.myJava.AutoSize = true;
+            this.myJava.Location = new System.Drawing.Point(413, 70);
+            this.myJava.Name = "myJava";
+            this.myJava.Size = new System.Drawing.Size(82, 17);
+            this.myJava.TabIndex = 14;
+            this.myJava.Text = "build-in java";
+            this.myJava.UseVisualStyleBackColor = true;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.comboBox1.Items.AddRange(new object[] {
+            "ModPack1",
+            "ModPack_2",
+            "Something else"});
+            this.comboBox1.Location = new System.Drawing.Point(12, 286);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 21);
+            this.comboBox1.TabIndex = 15;
+            this.comboBox1.Visible = false;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(12, 317);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(478, 13);
+            this.progressBar1.TabIndex = 16;
+            this.progressBar1.Tag = "";
+            this.progressBar1.Value = 35;
+            this.progressBar1.Visible = false;
             // 
             // lform
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(505, 342);
+            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.myJava);
             this.Controls.Add(this.ram_label);
             this.Controls.Add(this.ram_track);
             this.Controls.Add(this.ChDir_btn);
             this.Controls.Add(this.gamedir_tb);
-            this.Controls.Add(this.login_btn);
             this.Controls.Add(this.Passwd_tb);
             this.Controls.Add(this.Login_tb);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.uuid_tb);
-            this.Controls.Add(this.token_tb);
             this.Controls.Add(this.username_tb);
             this.Controls.Add(this.hasAccount);
             this.Controls.Add(this.Debug);
@@ -258,14 +242,9 @@
         private System.Windows.Forms.CheckBox Debug;
         private System.Windows.Forms.CheckBox hasAccount;
         private System.Windows.Forms.TextBox username_tb;
-        private System.Windows.Forms.TextBox token_tb;
-        private System.Windows.Forms.TextBox uuid_tb;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox Login_tb;
         private System.Windows.Forms.TextBox Passwd_tb;
-        private System.Windows.Forms.Button login_btn;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
@@ -273,6 +252,9 @@
         private System.Windows.Forms.Button ChDir_btn;
         private System.Windows.Forms.TrackBar ram_track;
         private System.Windows.Forms.Label ram_label;
+        private System.Windows.Forms.CheckBox myJava;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
 

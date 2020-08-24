@@ -4,7 +4,6 @@ namespace VLauncher_Own_
 {
     internal class Auth
     {
-        private string _tmp;
         public string accessToken { get; set; }
         public string clientToken { get; set; }
         public List<AvailableProfile> availableProfiles { get; set; }
