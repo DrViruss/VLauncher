@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace VLauncher_Own_
 {
@@ -21,4 +22,12 @@ namespace VLauncher_Own_
         public string name { get; set; }
         public string id { get; set; }
     }
+
+    public class jsonHash
+    {
+        public FileInfo file { get; set; }
+        public string hash { get; set; }
+    
+    }
+
 }

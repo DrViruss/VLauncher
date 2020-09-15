@@ -1,38 +1,31 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using System.Management;
 using System.IO;
 using System.Text.Json;
 using System.Net;
-using System.Xml.Linq;
 
 namespace VLauncher_Own_
 {
     public partial class lform : Form
     {
+
         public lform()
         {
             InitializeComponent();
 
+            PC pc = new PC();
+
             //First-time folder set
-            gamedir_tb.Text = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.minecraft";
-           
+            gamedir_tb.Text = pc.getAppData() + "\\.minecraft";
+
             //First-time RAM set
-            System.Management.ObjectQuery wql = new System.Management.ObjectQuery("SELECT * FROM Win32_OperatingSystem");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(wql);
-            ManagementObjectCollection results = searcher.Get();
-            double fres =0;
-            foreach (ManagementObject result in results)
-            {
-                fres = Math.Round((Convert.ToDouble(result["TotalVisibleMemorySize"]) / (1024 * 1024)), 2);//WTF??
-            }
-            ram_track.Maximum = (Int32)fres*1024-512;
+            ram_track.Maximum = (Int32)pc.getRAM()*1024-512;
             ram_track.Value = ram_track.Maximum / 2;
             ram_label.Text = ram_track.Value.ToString();
 
             //First-time Username set
-            username_tb.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).Split('\\')[2];
+            username_tb.Text = pc.getUsername();
 
             //Check Java on start
             if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JAVA_HOME")))
@@ -45,11 +38,13 @@ namespace VLauncher_Own_
             Login_tb.Enabled = false; 
             Passwd_tb.Enabled = false;
 
+            //get and set modpack in ComboBox
+            GetAndSetModpack();
         }
-
+       
         //-------------------TMP-Vars-------------------------\\
 
-        string ModPack_Name = "ModPack";
+
 
         //-------------------Functions-------------------------\\
 
@@ -67,14 +62,33 @@ namespace VLauncher_Own_
             return jvmpath;
         }
 
+        ///
+        /// 
+        ///
+        /// 
+        /// 
+        /// 
+        /// 
+
+
         string getJavaPath()
         {
-            if(!myJava.Checked)
+            if (!myJava.Checked)
                 return Environment.GetEnvironmentVariable("JAVA_HOME")+"\\bin";
             else
             {
-                //TODO: Download JAVA
-                return gamedir_tb.Text + "\\Java\\bin";
+               // if (Directory.Exists(gamedir_tb.Text+"\\Java"))
+                    return gamedir_tb.Text + "\\Java\\bin";
+                //else
+                //{
+                //    backgroundWorker1.RunWorkerAsync();
+                //}
+                //do
+                //{
+                //    Application.DoEvents();
+                //    if (!backgroundWorker1.IsBusy)
+                //    return gamedir_tb.Text + "\\Java\\bin";
+                //} while (true);
             }
         }
 
@@ -208,6 +222,34 @@ namespace VLauncher_Own_
         }
 
 
+
+        //-------------------MP_TEST-------------------------\\
+        
+        void GetAndSetModpack()
+        {
+            string link = "http://v-packs.c1.biz/ModPacks_Names.txt";
+            HttpWebRequest rq = (HttpWebRequest)WebRequest.Create(link);
+            rq.KeepAlive = false;
+
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)rq.GetResponse();
+                using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                {
+                    MPList_combo.Items.Clear();
+                    string[] SsS = sr.ReadToEnd().Split('\n');
+                    for (int i = 0; i < SsS.Length; i++)
+                        MPList_combo.Items.Add(SsS[i]);
+                    MPList_combo.SelectedIndex = 0;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Check your internet connection","Conection error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
+        }
+
+        
         //-------------------Main-------------------------\\
         void launch_mc()
         {
@@ -216,14 +258,9 @@ namespace VLauncher_Own_
             if (!(userinfo == null))
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo(NeedDebug());
-                string Appdatapath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 //OMG
                 //TODO: test another "--versionType" :D
-                startInfo.Arguments = "-Djava.net.preferIPv4Stack=true -Xmn128M -Xmx" + ram_label.Text + "M -Djava.library.path=" + gamedir_tb.Text + "\\" + ModPack_Name + "\\versions\\1.12.2-forge-14.23.5.2854\\natives -cp " + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\minecraftforge\\forge\\1.12.2-14.23.5.2854\\forge-1.12.2-14.23.5.2854.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\ow2\\asm\\asm-debug-all\\5.2\\asm-debug-all-5.2.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\minecraft\\launchwrapper\\1.12\\launchwrapper-1.12.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\jline\\jline\\3.5.1\\jline-3.5.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\typesafe\\akka\\akka-actor_2.11\\2.3.3\\akka-actor_2.11-2.3.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\typesafe\\config\\1.2.1\\config-1.2.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\scala-actors-migration_2.11\\1.1.0\\scala-actors-migration_2.11-1.1.0.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\scala-compiler\\2.11.1\\scala-compiler-2.11.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\plugins\\scala-continuations-library_2.11\\1.0.2_mc\\scala-continuations-library_2.11-1.0.2_mc.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\plugins\\scala-continuations-plugin_2.11.1\\1.0.2_mc\\scala-continuations-plugin_2.11.1-1.0.2_mc.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\scala-library\\2.11.1\\scala-library-2.11.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\scala-parser-combinators_2.11\\1.0.1\\scala-parser-combinators_2.11-1.0.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\scala-reflect\\2.11.1\\scala-reflect-2.11.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\scala-swing_2.11\\1.0.1\\scala-swing_2.11-1.0.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\scala-lang\\scala-xml_2.11\\1.0.2\\scala-xml_2.11-1.0.2.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\lzma\\lzma\\0.0.1\\lzma-0.0.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\java3d\\vecmath\\1.5.2\\vecmath-1.5.2.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\sf\\trove4j\\trove4j\\3.0.3\\trove4j-3.0.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\apache\\maven\\maven-artifact\\3.5.3\\maven-artifact-3.5.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\sf\\jopt-simple\\jopt-simple\\5.0.3\\jopt-simple-5.0.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\tlauncher\\patchy\\1.1\\patchy-1.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\oshi-project\\oshi-core\\1.1\\oshi-core-1.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\java\\dev\\jna\\jna\\4.4.0\\jna-4.4.0.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\java\\dev\\jna\\platform\\3.4.0\\platform-3.4.0.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\ibm\\icu\\icu4j-core-mojang\\51.2\\icu4j-core-mojang-51.2.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\sf\\jopt-simple\\jopt-simple\\5.0.3\\jopt-simple-5.0.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\paulscode\\codecjorbis\\20101023\\codecjorbis-20101023.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\paulscode\\codecwav\\20101023\\codecwav-20101023.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\paulscode\\libraryjavasound\\20101123\\libraryjavasound-20101123.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\paulscode\\librarylwjglopenal\\20100824\\librarylwjglopenal-20100824.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\paulscode\\soundsystem\\20120107\\soundsystem-20120107.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\io\\netty\\netty-all\\4.1.9.Final\\netty-all-4.1.9.Final.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\google\\guava\\guava\\21.0\\guava-21.0.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\apache\\commons\\commons-lang3\\3.5\\commons-lang3-3.5.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\commons-io\\commons-io\\2.5\\commons-io-2.5.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\commons-codec\\commons-codec\\1.10\\commons-codec-1.10.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\java\\jinput\\jinput\\2.0.5\\jinput-2.0.5.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\net\\java\\jutils\\jutils\\1.0.0\\jutils-1.0.0.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\google\\code\\gson\\gson\\2.8.0\\gson-2.8.0.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\mojang\\authlib\\1.5.25\\authlib-1.5.25.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\mojang\\realms\\1.10.22\\realms-1.10.22.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\apache\\commons\\commons-compress\\1.8.1\\commons-compress-1.8.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\apache\\httpcomponents\\httpclient\\4.3.3\\httpclient-4.3.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\commons-logging\\commons-logging\\1.1.3\\commons-logging-1.1.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\apache\\httpcomponents\\httpcore\\4.3.2\\httpcore-4.3.2.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\it\\unimi\\dsi\\fastutil\\7.1.0\\fastutil-7.1.0.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\apache\\logging\\log4j\\log4j-api\\2.8.1\\log4j-api-2.8.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\apache\\logging\\log4j\\log4j-core\\2.8.1\\log4j-core-2.8.1.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\lwjgl\\lwjgl\\lwjgl\\2.9.4-nightly-20150209\\lwjgl-2.9.4-nightly-20150209.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\org\\lwjgl\\lwjgl\\lwjgl_util\\2.9.4-nightly-20150209\\lwjgl_util-2.9.4-nightly-20150209.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\libraries\\com\\mojang\\text2speech\\1.10.3\\text2speech-1.10.3.jar;" + gamedir_tb.Text + "\\" + ModPack_Name + "\\versions\\1.12.2-forge-14.23.5.2854\\1.12.2-forge-14.23.5.2854.jar -Dminecraft.applet.TargetDirectory=" + gamedir_tb.Text + "\\" + ModPack_Name + " -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true net.minecraft.launchwrapper.Launch --username " + userinfo[0] + " --version 1.12.2-forge-14.23.5.2854 --gameDir " + gamedir_tb.Text + "\\" + ModPack_Name + " --assetsDir " + gamedir_tb.Text + "\\assets --assetIndex 1.12 --uuid " + userinfo[2] + " --accessToken " + userinfo[1] + " --userType " + userinfo[3] + " --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --versionType Forge --width 925 --height 530";
-
-                //name  *nickname*
-                //token null
-                //uuid  00000000-0000-0000-0000-000000000000 
+                    startInfo.Arguments = "-Djava.net.preferIPv4Stack=true -Xmn128M -Xmx" + ram_label.Text + "M -Djava.library.path=" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\versions\\1.12.2-forge-14.23.5.2854\\natives -cp " + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\forge-1.12.2-14.23.5.2854.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\asm-debug-all-5.2.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\launchwrapper-1.12.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\jline-3.5.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\akka-actor_2.11-2.3.3.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\config-1.2.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-actors-migration_2.11-1.1.0.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-compiler-2.11.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-continuations-library_2.11-1.0.2_mc.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-continuations-plugin_2.11.1-1.0.2_mc.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-library-2.11.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-parser-combinators_2.11-1.0.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-reflect-2.11.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-swing_2.11-1.0.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\scala-xml_2.11-1.0.2.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\lzma-0.0.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\vecmath-1.5.2.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\trove4j-3.0.3.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\maven-artifact-3.5.3.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\jopt-simple-5.0.3.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\oshi-core-1.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\jna-4.4.0.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\platform-3.4.0.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\icu4j-core-mojang-51.2.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\codecjorbis-20101023.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\codecwav-20101023.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\libraryjavasound-20101123.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\librarylwjglopenal-20100824.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\soundsystem-20120107.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\netty-all-4.1.9.Final.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\guava-21.0.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\commons-lang3-3.5.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\commons-io-2.5.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\commons-codec-1.10.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\jinput-2.0.5.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\jutils-1.0.0.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\gson-2.8.0.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\authlib-1.5.25.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\realms-1.10.22.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\commons-compress-1.8.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\httpclient-4.3.3.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\commons-logging-1.1.3.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\httpcore-4.3.2.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\fastutil-7.1.0.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\log4j-api-2.8.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\log4j-core-2.8.1.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\lwjgl-2.9.4-nightly-20150209.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\lwjgl_util-2.9.4-nightly-20150209.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\libraries\\text2speech-1.10.3.jar;" + gamedir_tb.Text + "\\" + MPList_combo.Text + "\\versions\\1.12.2-forge-14.23.5.2854\\1.12.2-forge-14.23.5.2854.jar -Dminecraft.applet.TargetDirectory=" + gamedir_tb.Text + "\\" + MPList_combo.Text + " -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true net.minecraft.launchwrapper.Launch --username " + userinfo[0] + " --version 1.12.2-forge-14.23.5.2854 --gameDir " + gamedir_tb.Text + "\\" + MPList_combo.Text + " --assetsDir " + gamedir_tb.Text + "\\assets --assetIndex 1.12 --uuid " + userinfo[2] + " --accessToken " + userinfo[1] + " --userType " + userinfo[3] + " --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --versionType Forge --width 925 --height 530";
                 Process.Start(startInfo);
             }
         }
@@ -254,6 +291,7 @@ namespace VLauncher_Own_
                 assets = _YourFolder_\assets (different versions have own index)
                 main dir = _YourFolder_\_ModPackName_ (here stored: mods, config ,version,libs etc)
              */
+
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() == DialogResult.OK)
                 gamedir_tb.Text = fbd.SelectedPath;
@@ -262,6 +300,33 @@ namespace VLauncher_Own_
         private void ram_track_Scroll(object sender, EventArgs e)
         {
             ram_label.Text = ram_track.Value.ToString();
+        }
+
+
+        /*
+         * 1.Remove this buttons
+         * 2. Check hash before starting
+         * 3. Download if hash failure
+         * 4. Check+Download+Run - on 1 button
+         * 5. Rename essets foulder to 1.12.2
+         */
+        
+        private void download_btn_Click(object sender, EventArgs e)
+        {
+            Downloader downloader = new Downloader();
+            downloader.mpname = MPList_combo.Text;
+            downloader.gamepath = gamedir_tb.Text;
+          //downloader.Download(Downloader.DownloadType.mpname, label2, progressBar1);
+          //downloader.Download(Downloader.DownloadType.java, label2, progressBar1);
+            downloader.Download(Downloader.DownloadType.assets, label2, progressBar1);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Hasher hasher = new Hasher();
+            //hasher.hashToFile(hasher.getDirHash(gamedir_tb.Text+"\\Java",gamedir_tb),gamedir_tb.Text+"\\Java") ;
+            //hasher.hashToFile(hasher.getDirHash(gamedir_tb.Text + "\\"+MPList_combo.Text, gamedir_tb), gamedir_tb.Text);
+            hasher.hashToFile(hasher.getDirHash(gamedir_tb.Text + "\\assets", gamedir_tb), gamedir_tb.Text);
         }
     }
 }
